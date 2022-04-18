@@ -8,7 +8,7 @@ def talker():
     pub = rospy.Publisher('/vmegarover/diff_drive_controller/cmd_vel', Twist, queue_size=1)
     while not rospy.is_shutdown():
         vel = Twist()
-        direction = raw_input ("push_keyboard:,,,")
+        direction = input ("push_keyboard→:,,,")
         #前に進む
         if "" in direction:
             vel.linear.x = +
@@ -16,7 +16,7 @@ def talker():
         if "" in direction:
             vel.linear.x = -
         #右に曲がる
-        if "" in direction:
+        if "r" in direction:
             vel.angular.z = +
         #左に曲がる
         if "" in direction:

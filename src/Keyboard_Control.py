@@ -113,3 +113,70 @@ class FeatureFromRecog():
             return "none"
         else:
             return self.cloth_color
+ def __init__(self):
+        smach.State.__init__(self, outcomes = ['approach_finish'],
+                             input_keys = ['g_count_in'])
+        # Service
+        self.gen_coord_srv = rospy.ServiceProxy('/human_coord_generator', SimpleTrg)
+        self.ap_srv = rospy.ServiceProxy('/approach_person_server', StrTrg)
+        self.navi_srv = rospy.ServiceProxy('navi_location_server', NaviLocation)
+        self.navi_coord_srv = rospy.ServiceProxy('navi_coord_server', NaviCoord)
+        # Topic
+        self.head_pub = rospy.Publisher('/servo/head', Float64, queue_size = 1)
+        self.bc = BaseControl()
+
+    def execute(self, userdata):
+        rospy.loginfo("Executing state: APPROACH_GUEST")
+        # return 'approach_finish'
+        guest_num = userdata.g_count_in
+        guest_name = "human_" + str(guest_num)
+        human_loc = rospy.get_param('/tmp_human_location')
+        self.bc.rotateAngle(100,0.2)
+        # tts_srv("Move to guest")
+        wave_srv("/fmm/move_guest")
+        
+        rospy.sleep(0.5)
+        self.navi_srv('fmm')
+
+        if guest_num == 0:
+            self.head_pub.publish(0)
+            rospy.sleep(1.0)
+            result = self.gen_coord_srv().result
+            print(result)
+            result = self.ap_srv(data = guest_name)    
+        elif guest_num == 1:
+            self.head_pub.publish(0)
+            self.bc.rotateAngle(-55, 0.2)
+            rospy.sleep(5.0)
+            result = self.gen_coord_srv().result
+            print(result)
+            #self.bc.rotateAngle(-330,0.2)
+            rospy.sleep(1.0)
+            result = self.ap_srv(data = guest_name)
+            # self.bc.rotateAngle(-10)
+            # for i in range(3):
+                # result = self.gen_coord_srv().result
+                # if result:
+                    # break
+                # else:
+                    # break
+                    # self.bc.rotateAngle(-10)
+        elif guest_num == 2:
+            self.head_pub.publish(0)
+            self.bc.rotateAngle(-50, 0.2)
+            rospy.sleep(5.0)
+            result = self.gen_coord_srv().result
+            self.navi_coord_srv (loc_coord = human_1)
+
+        else:
+            pass
+        #result = self.ap_srv(data = guest_name)
+        #print(result)
+        
+        self.head_pub.publish(0)
+         self.navi_coord_srv 
+        if result:
+            return 'approach_finish'
+         
+        else:
+            return 'approach_finish'
